@@ -30,6 +30,9 @@
             <if test ="image != null and image != ''">
                 image = #{image},
             </if>
+            <if test ="currentCity != null and currentCity != ''">
+                current_city = #{currentCity},
+            </if>
             <if test="entrydate != null">
                 entrydate = #{entrydate},
             </if>

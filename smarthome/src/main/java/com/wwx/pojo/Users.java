@@ -19,5 +19,6 @@ public class Users {
     private LocalDateTime createTime; //创建时间
     private LocalDateTime updateTime; //修改时间
     private String image; //头像
+    private String currentCity; //当前城市
 
 }

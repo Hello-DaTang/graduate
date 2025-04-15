@@ -41,5 +41,4 @@ public class LoginController {
         //登录失败  
         return Result.error("用户名或密码错误");
     }
-
 }
