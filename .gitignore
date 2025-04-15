@@ -1,0 +1,26 @@
+# IDE配置
+.vscode
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# 编译输出
+*/target/
+**/target/
+*.class
+*.jar
+*.war
+
+# 日志
+*.log
+
+# 环境变量和本地配置
+.env
+.env.*
+**/application-local.yml
+**/application-local.properties
+
+# 系统文件
+.DS_Store
+Thumbs.db

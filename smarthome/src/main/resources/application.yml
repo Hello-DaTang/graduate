@@ -1,0 +1,65 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]  # 引入.env文件中的配置
+  # 数据库连接信息
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/graduate
+    username: root
+    password: 123123
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+  # Spring AI配置
+  ai:
+    openai:
+      base-url: https://api.deepseek.com
+      api-key: ${OPENAI_API_KEY}  # 从环境变量中获取API密钥
+      # base-url: https://api.openai.com/v1
+      chat:
+        options:
+          model: deepseek-chat  # 确认模型名称是否正确
+          # model: gpt-3.5-turbo  # 使用GPT-3.5-turbo模型
+          temperature: 0.7
+          max-tokens: 2000
+          top-p: 1.0  # 添加top-p参数
+      # 添加更多配置参数
+      http:
+        read-timeout: 60000  # 60秒读取超时
+        connect-timeout: 60000  # 60秒连接超时
+      embedding:
+        enabled: false  # DeepSeek不支持嵌入功能
+
+# 服务器配置
+server:
+  port: 8080
+
+# 日志配置，用于调试
+logging:
+  level:
+    com.wwx: DEBUG
+    org.springframework.ai: DEBUG
+    org.springframework.jdbc.support.JdbcTransactionManager: debug
+
+# 配置墨迹天气api路径
+moji:
+  weather:
+    host: https://aliv18.data.moji.com
+    path: /whapi/json/alicityweather/forecast24hours
+    appCode: ${MOJI_APP_CODE}  # 从环境变量中获取AppCode
+    token: ${MOJI_TOKEN}  # 从环境变量中获取Token
+#mybatis配置
+mybatis:
+  type-handlers-package: com.wwx.handler  # 处理器所在包
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+#阿里云OSS
+aliyun:
+  oss:
+    endpoint: https://oss-cn-beijing.aliyuncs.com
+    accessKeyId: ${ALIYUN_ACCESS_KEY_ID}  # 从环境变量中获取AccessKeyId
+    accessKeySecret: ${ALIYUN_ACCESS_KEY_SECRET}  # 从环境变量中获取AccessKeySecret
+    bucketName: web-tlias-datang

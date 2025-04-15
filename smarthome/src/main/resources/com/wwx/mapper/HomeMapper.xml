@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wwx.mapper.HomeMapper">
+
+    <!-- list --> 
+
+    <select id="list" resultType="com.wwx.pojo.SmartHome">
+        SELECT * FROM smart_home 
+        <where>
+            <if test="homeName != null and homeName != ''">
+                home_name LIKE CONCAT('%', #{homeName}, '%')
+            </if>
+            <if test="begin != null and end != null">
+                AND create_time BETWEEN #{begin} AND #{end}
+            </if>
+            AND user_id = #{userId}
+        </where>
+        ORDER BY update_time DESC
+    </select>
+
+    <!-- delete --> 
+
+    <delete id="delete">
+        DELETE 
+        FROM smart_home 
+        WHERE id IN 
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- insert --> 
+
+    <insert id="insert">
+        INSERT INTO smart_home 
+            (user_id, home_name, device_data, create_time, update_time) 
+        VALUES 
+            (#{userId}, #{homeName}, #{deviceDataJson}, #{createTime}, #{updateTime})
+    </insert>    
+
+    <!-- getById --> 
+
+    <select id="getById" resultType="com.wwx.pojo.SmartHome">
+        SELECT 
+            id, 
+            user_id, 
+            home_name, 
+            device_data AS deviceDataJson, 
+            create_time, 
+            update_time
+        FROM smart_home 
+        WHERE id = #{id}
+    </select>
+
+    <!-- update --> 
+
+    <update id="update">
+        UPDATE smart_home
+        <set>
+            <if test="homeName != null and homeName != ''">
+                home_name = #{homeName},
+            </if>
+            <if test="deviceDataJson != null">
+                device_data = #{deviceDataJson},
+            </if>
+            update_time = now()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- deleteByUserId --> 
+
+    <delete id="deleteByUserId">
+        DELETE 
+        FROM smart_home 
+        WHERE user_id = #{userId}
+    </delete>    
+    
+</mapper>
