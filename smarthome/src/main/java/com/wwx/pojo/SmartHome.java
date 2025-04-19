@@ -28,4 +28,5 @@ public class SmartHome {
 
     private LocalDateTime createTime; // 加入时间
     private LocalDateTime updateTime; // 更新时间
+    private String location; // 家居位置
 }

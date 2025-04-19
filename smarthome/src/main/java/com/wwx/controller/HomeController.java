@@ -36,12 +36,13 @@ public class HomeController {
     @GetMapping
     public Result page(@RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            String homeName) {
+            String homeName,
+            String location) {
 
         Integer userId =parseUserIdFromTokenUtils.getUserId().orElseThrow(); // 如果解析失败则抛出异常
 
         log.info("分页查询：{},{},{}", page, pageSize, homeName);
-        PageBean pageBean = homeService.page(page, pageSize, homeName, userId);
+        PageBean pageBean = homeService.page(page, pageSize, homeName, userId,location);
         return Result.success(pageBean);
     }
 

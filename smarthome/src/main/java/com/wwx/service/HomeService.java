@@ -8,7 +8,7 @@ import com.wwx.pojo.SmartHome;
 
 public interface HomeService {
 
-    PageBean page(Integer page, Integer pageSize, String homeName, Integer userId);
+    PageBean page(Integer page, Integer pageSize, String homeName, Integer userId,String location);
 
     void delete(List<Integer> ids);
 

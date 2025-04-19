@@ -12,11 +12,15 @@
         home_name, 
         device_data AS deviceDataJson, 
         create_time, 
-        update_time
+        update_time,
+        location
         FROM smart_home 
         <where>
             <if test="homeName != null and homeName != ''">
                 home_name LIKE CONCAT('%', #{homeName}, '%')
+            </if>
+            <if test="location != null and location != ''">
+                location = #{location}
             </if>
             AND user_id = #{userId}
         </where>
@@ -38,9 +42,9 @@
 
     <insert id="insert">
         INSERT INTO smart_home 
-            (user_id, home_name, device_data, create_time, update_time) 
+            (user_id, home_name, device_data, create_time, update_time, location) 
         VALUES 
-            (#{userId}, #{homeName}, #{deviceDataJson}, #{createTime}, #{updateTime})
+            (#{userId}, #{homeName}, #{deviceDataJson}, #{createTime}, #{updateTime}, #{location})
     </insert>    
 
     <!-- getById --> 
@@ -64,6 +68,9 @@
         <set>
             <if test="homeName != null and homeName != ''">
                 home_name = #{homeName},
+            </if>
+            <if test="location != null and location != ''">
+                location = #{location},
             </if>
             <if test="deviceDataJson != null">
                 device_data = #{deviceDataJson},

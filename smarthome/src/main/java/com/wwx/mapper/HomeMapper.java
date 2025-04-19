@@ -10,7 +10,7 @@ import com.wwx.pojo.SmartHome;
 @Mapper
 public interface HomeMapper {
 
-    List<SmartHome> list(String homeName, Integer userId);
+    List<SmartHome> list(String homeName, Integer userId, String location);
 
     void delete(List<Integer> ids);
 

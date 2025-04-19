@@ -35,6 +35,11 @@ spring:
 # 服务器配置
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
 
 # 日志配置，用于调试
 logging:
