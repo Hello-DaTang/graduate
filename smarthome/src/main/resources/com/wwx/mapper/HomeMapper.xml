@@ -7,13 +7,16 @@
     <!-- list --> 
 
     <select id="list" resultType="com.wwx.pojo.SmartHome">
-        SELECT * FROM smart_home 
+        SELECT id, 
+        user_id, 
+        home_name, 
+        device_data AS deviceDataJson, 
+        create_time, 
+        update_time
+        FROM smart_home 
         <where>
             <if test="homeName != null and homeName != ''">
                 home_name LIKE CONCAT('%', #{homeName}, '%')
-            </if>
-            <if test="begin != null and end != null">
-                AND create_time BETWEEN #{begin} AND #{end}
             </if>
             AND user_id = #{userId}
         </where>

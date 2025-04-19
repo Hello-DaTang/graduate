@@ -39,14 +39,12 @@ public class HomeController {
     @GetMapping
     public Result page(@RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            String homeName, 
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+            String homeName) {
 
         Integer userId =parseUserIdFromTokenUtils.getUserId().orElseThrow(); // 如果解析失败则抛出异常
 
-        log.info("分页查询：{},{},{},{},{}", page, pageSize, homeName, begin, end);
-        PageBean pageBean = homeService.page(page, pageSize, homeName, userId, begin, end);
+        log.info("分页查询：{},{},{}", page, pageSize, homeName);
+        PageBean pageBean = homeService.page(page, pageSize, homeName, userId);
         return Result.success(pageBean);
     }
 

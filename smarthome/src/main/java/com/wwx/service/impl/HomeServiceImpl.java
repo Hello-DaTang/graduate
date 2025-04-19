@@ -26,12 +26,25 @@ public class HomeServiceImpl implements HomeService {
     private final ObjectMapper objectMapper = new ObjectMapper(); // 用于 JSON 转换
 
     @Override
-    public PageBean page(Integer page, Integer pageSize, String homeName, Integer userId, LocalDate begin, LocalDate end) {
+    public PageBean page(Integer page, Integer pageSize, String homeName, Integer userId) {
         // 1. 设置分页参数
         PageHelper.startPage(page, pageSize);
         // 2. 执行查询
-        try (Page<SmartHome> p = (Page<SmartHome>) homeMapper.list(homeName, userId, begin, end)) {
-            // 3. 封装 PageBean 对象
+        try (Page<SmartHome> p = (Page<SmartHome>) homeMapper.list(homeName, userId)) {
+            // 3. 处理每个SmartHome对象，将JSON字符串转换为Map
+            for (SmartHome smartHome : p.getResult()) {
+                if (smartHome.getDeviceDataJson() != null) {
+                    try {
+                        // 将JSON字符串转换为Map
+                        Map<String, Object> deviceData = objectMapper.readValue(smartHome.getDeviceDataJson(), Map.class);
+                        smartHome.setDeviceData(deviceData);
+                    } catch (JsonProcessingException e) {
+                        System.err.println("Failed to parse deviceDataJson to Map: " + e.getMessage());
+                        // 可以选择继续处理其他记录而不是抛出异常
+                    }
+                }
+            }
+            // 4. 封装PageBean对象
             return new PageBean(p.getTotal(), p.getResult());
         }
     }

@@ -1,7 +1,6 @@
 package com.wwx.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,8 +42,15 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public void update(Users users) {
         //获得当前时间戳
-        users.setUpdateTime(LocalDateTime.now());
-        usersMapper.update(users);
+        try{
+            users.setUpdateTime(LocalDateTime.now());
+            usersMapper.update(users);
+        } finally {
+            UserLog userLog = new UserLog();
+            userLog.setCreateTime(LocalDateTime.now());
+            userLog.setDescription("修改用户:"+users.getId());
+            userLogService.insert(userLog);
+        }
     }
 
     @Transactional(rollbackFor=Exception.class)
