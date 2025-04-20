@@ -29,7 +29,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<spring-ai.version>1.0.0-M6</spring-ai.version>
+		<spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
 	</properties>
 	<dependencies>
 
@@ -44,12 +44,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-core</artifactId>
+			<artifactId>spring-ai-starter-model-openai</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
@@ -157,13 +152,34 @@
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
-				<version>${spring-ai.version}</version>
+				<version>1.0.0-SNAPSHOT</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<repositories>
+		<repository>
+		  <id>spring-snapshots</id>
+		  <name>Spring Snapshots</name>
+		  <url>https://repo.spring.io/snapshot</url>
+		  <releases>
+			<enabled>false</enabled>
+		  </releases>
+		</repository>
+		<repository>
+		  <name>Central Portal Snapshots</name>
+		  <id>central-portal-snapshots</id>
+		  <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+		  <releases>
+			<enabled>false</enabled>
+		  </releases>
+		  <snapshots>
+			<enabled>true</enabled>
+		  </snapshots>
+		</repository>
+	  </repositories>
+	<!-- <repositories>
 		<repository>
 			<id>central</id>
 			<url>https://repo.maven.apache.org/maven2/</url>
@@ -190,7 +206,7 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
-	</repositories>
+	</repositories> -->
 	<build>
 		<plugins>
 			<plugin>
