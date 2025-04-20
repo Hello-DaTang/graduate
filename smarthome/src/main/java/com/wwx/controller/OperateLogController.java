@@ -25,7 +25,6 @@ public class OperateLogController {
     private ParseUserIdFromTokenUtils parseUserIdFromTokenUtils;
 
     //获取当前用户操作信息
-    @Log
     @RequestMapping("/info")
     public Result get() {
         log.info("获取用户操作信息");

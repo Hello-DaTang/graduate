@@ -3,14 +3,11 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wwx.mapper.OperateLogMapper">
+    <!-- getByOperaterUserId --> 
 
-
-    <select id="list" resultType="com.wwx.pojo.OperateLog">
+    <select id="getByOperaterUserId" resultType="com.wwx.pojo.OperateLog">
         SELECT * FROM operate_log 
-
-            AND operate_user = #{userId}
-
+        WHERE operate_user = #{userId}
         ORDER BY operate_time DESC
-    </select>
-    
+    </select>    
 </mapper>

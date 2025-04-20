@@ -1,14 +1,12 @@
 package com.wwx.mapper;
 
-import com.wwx.pojo.OperateLog;
-import com.wwx.pojo.SmartHome;
-
 import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+
+import com.wwx.pojo.OperateLog;
 
 @Mapper
 public interface OperateLogMapper {
@@ -23,6 +21,6 @@ public interface OperateLogMapper {
      * @param userId 用户ID
      * @return 操作日志对象
      */
-    @Select("select * from operate_log where operate_user=#{userId}")
+
     List<OperateLog> getByOperaterUserId(@Param("userId") Integer userId);
 }

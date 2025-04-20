@@ -28,7 +28,6 @@ public class UsersController {
     private ParseUserIdFromTokenUtils parseUserIdFromTokenUtils;
 
     //获取当前用户信息
-    @Log
     @RequestMapping("/info")
     public Result get() {
         log.info("获取用户信息");
