@@ -58,19 +58,17 @@ public class ChatController {
     @PostMapping("/postchat")
     public Result postchat(@RequestBody String prompt) {
         ChatClient chatClient = ChatClient.create(ChatModel);
-        String systemPrompt = "你是一位智能家居专家AI，请根据用户的设备信息、天气数据和历史操作习惯，提供最合适的智能家居配置方案。\n" +
+        String systemPrompt = "你是一位智能家居专家AI，请根据用户的要求以及设备信息、天气数据和历史操作习惯，提供最合适的智能家居配置方案。\n" +
         "请分析设备数据、天气情况和用户操作习惯，提供具体的调整建议，以优化用户的智能家居体验。\n" +
         "用户可以通过你的建议直接控制家中设备，因此你需要返回详细的设备控制参数。\n\n" +
         "你的回复必须包含:\n" +
-        "一个JSON格式的设备更新指令，必须用三个反引号包裹，形如：\n" +
-        "```json\n" +
         "{\n" +
         "  \"devices\": [\n" +
         "    {\n" +
         "      \"id\": 设备ID(数字),\n" +
         "      \"deviceData\": {\n" +
         "        \"status\": \"on或off\",\n" +
-        "        // 其他特定设备的参数，根据设备类型可能包括：\n" +
+        "        // 其他特定设备的参数，你需要依据用户传来的数据分析哪些需要修改参数，设备类型可能包括但不限于：\n" +
         "        // 窗帘: position(0-100数字), material, mode\n" +
         "        // 空调: temperature(数字), fanSpeed, mode\n" +
         "        // 灯光: brightness(0-100数字), color, mode\n" +
@@ -78,8 +76,7 @@ public class ChatController {
         "    }\n" +
         "  ]\n" +
         "}\n" +
-        "```\n" +
-        "只建议更新必要的设备和参数，不要修改用户没有必要改变的参数值。 确保返回的JSON格式正确，包含设备ID和需要更新的参数。";
+        "只建议更新必要的设备和参数，不要修改用户没有必要改变的参数值，但要确保返回的数据完整，包含设备ID和所有参数包括更新和不更新的。";
 
         // 动态设置 JSON_OBJECT 格式
         OpenAiChatOptions options = OpenAiChatOptions.builder()
@@ -90,6 +87,7 @@ public class ChatController {
                 .system(systemPrompt)
                 // 输入用户消息
                 .user(prompt)
+                //设置响应格式为JSON_OBJECT
                 .options(options)
                 //响应的结果
                 // call代表非流式问答，返回的结果可以是ChatResponse，也可以是Entity（转成java类型），也可以是字符串直接提取回答结果。
