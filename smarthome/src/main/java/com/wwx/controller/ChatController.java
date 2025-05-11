@@ -71,7 +71,7 @@ public class ChatController {
         "      \"id\": 设备ID(数字),\n" +
         "      \"deviceData\": {\n" +
         "        \"status\": \"on或off\",\n" +
-        "        // 其他特定设备的参数，你需要依据用户传来的数据分析哪些需要修改参数，设备类型可能包括但不限于：\n" +
+        "        // 其他特定设备的参数，你需要依据用户传来的数据分析哪些需要修改参数，但返回所有参数包括没修改的参数，设备类型可能包括但不限于：\n" +
         "        // 窗帘: position(0-100数字), material, mode\n" +
         "        // 空调: temperature(数字), fanSpeed, mode\n" +
         "        // 灯光: brightness(0-100数字), color, mode\n" +
