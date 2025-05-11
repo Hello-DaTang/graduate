@@ -3,7 +3,8 @@ package com.wwx.controller;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+// import org.springframework.ai.chat.memory.InMemoryChatMemory;
 // import org.springframework.ai.chat.messages.UserMessage;
 // import org.springframework.ai.chat.model.ChatResponse;
 // import org.springframework.ai.chat.prompt.Prompt;
@@ -33,8 +34,10 @@ import reactor.core.publisher.Flux;
 public class ChatController {
     
     private final OpenAiChatModel ChatModel;
-    //存储聊天记录
-    private final ChatMemory chatMemory = new InMemoryChatMemory();
+    //存储聊天记录弃用
+    // private final ChatMemory chatMemory = new InMemoryChatMemory();
+    // 修改属性声明
+    private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
     @Autowired
     public ChatController(OpenAiChatModel ChatModel) {
         this.ChatModel = ChatModel;
