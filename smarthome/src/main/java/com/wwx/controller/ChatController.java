@@ -25,6 +25,7 @@ import com.wwx.pojo.Result;
 import lombok.extern.slf4j.Slf4j;
 // import reactor.core.publisher.Flux;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 // import java.util.Map;
 
@@ -37,7 +38,10 @@ public class ChatController {
     //存储聊天记录弃用
     // private final ChatMemory chatMemory = new InMemoryChatMemory();
     // 修改属性声明
-    private final ChatMemory chatMemory = MessageWindowChatMemory.builder().build();
+    private final ChatMemory chatMemory = MessageWindowChatMemory
+            .builder()
+            .maxMessages(20)
+            .build();
     @Autowired
     public ChatController(OpenAiChatModel ChatModel) {
         this.ChatModel = ChatModel;
@@ -117,7 +121,10 @@ public class ChatController {
     @GetMapping(value = "/chatStream/history",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStreamWithHistory(@RequestParam String prompt,@RequestParam String sessionID){
         //设置聊天记录的最大长度为10，在内存中存储聊天记录，返回给大模型前将历史记录拼接到prompt中
-        MessageChatMemoryAdvisor messageChatMemoryAdvisor = new MessageChatMemoryAdvisor(chatMemory,sessionID,10);
+        var messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
+            .conversationId(sessionID)
+            .scheduler(Schedulers.boundedElastic()) // 添加调度器
+            .build();
         return ChatClient.create(ChatModel)
                 .prompt()
                 .system("你是智能家居系统管家，用markdown格式返回")
