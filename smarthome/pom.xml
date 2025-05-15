@@ -217,7 +217,7 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>${project.lombok.version}</version>
+							<version>${lombok.version}</version>  <!-- 使用Spring Boot定义的lombok版本变量 -->
 						</path>
 					</annotationProcessorPaths>
 				</configuration>

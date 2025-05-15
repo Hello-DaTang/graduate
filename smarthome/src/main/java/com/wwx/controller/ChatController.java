@@ -1,155 +1,74 @@
 package com.wwx.controller;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-// import org.springframework.ai.chat.memory.InMemoryChatMemory;
-// import org.springframework.ai.chat.messages.UserMessage;
-// import org.springframework.ai.chat.model.ChatResponse;
-// import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.ResponseFormat;
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.wwx.pojo.Result;
+import com.wwx.service.ChatService;
 
 import lombok.extern.slf4j.Slf4j;
-// import reactor.core.publisher.Flux;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
-
-// import java.util.Map;
-
 
 @Slf4j
 @RestController
 public class ChatController {
     
-    private final OpenAiChatModel ChatModel;
-    //存储聊天记录弃用
-    // private final ChatMemory chatMemory = new InMemoryChatMemory();
-    // 修改属性声明
-    private final ChatMemory chatMemory = MessageWindowChatMemory
-            .builder()
-            .maxMessages(20)
-            .build();
     @Autowired
-    public ChatController(OpenAiChatModel ChatModel) {
-        this.ChatModel = ChatModel;
-    }
+    private ChatService chatService;
+    
     @GetMapping("/chat")
-    public Result chat(@RequestParam String prompt) {
-        ChatClient chatClient = ChatClient.create(ChatModel);
-        String response = chatClient
-                // 表示要发起一个对话
-                .prompt()
-                .system("你是智能家居系统管家，用markdown格式返回")
-                // 输入用户消息
-                .user(prompt)
-                //响应的结果
-                // call代表非流式问答，返回的结果可以是ChatResponse，也可以是Entity（转成java类型），也可以是字符串直接提取回答结果。
-                .call()
-                // 获取回答内容
-                .content();
-        return Result.success(response);
-    }
-    @PostMapping("/postchat")
-    public Result postchat(@RequestBody String prompt) {
-        ChatClient chatClient = ChatClient.create(ChatModel);
-        String systemPrompt = "你是一位智能家居专家AI，请根据用户的要求以及设备信息、天气数据和历史操作习惯，提供最合适的智能家居配置方案。\n" +
-        "请分析设备数据、天气情况和用户操作习惯，提供具体的调整建议，以优化用户的智能家居体验。\n" +
-        "用户可以通过你的建议直接控制家中设备，因此你需要返回详细的设备控制参数。\n\n" +
-        "你的回复必须包含:\n" +
-        "{\n" +
-        "  \"devices\": [\n" +
-        "    {\n" +
-        "      \"id\": 设备ID(数字),\n" +
-        "      \"deviceData\": {\n" +
-        "        \"status\": \"on或off\",\n" +
-        "        // 其他特定设备的参数，你需要依据用户传来的数据分析哪些需要修改参数，但返回所有参数包括没修改的参数，设备类型可能包括但不限于：\n" +
-        "        // 窗帘: position(0-100数字), material, mode\n" +
-        "        // 空调: temperature(数字), fanSpeed, mode\n" +
-        "        // 灯光: brightness(0-100数字), color, mode\n" +
-        "      }\n" +
-        "    }\n" +
-        "  ]\n" +
-        "}\n" +
-        "只建议更新必要的设备和参数，不要修改用户没有必要改变的参数值，但要确保返回的数据完整，包含设备ID和所有参数包括更新和不更新的。";
-
-        // 动态设置 JSON_OBJECT 格式
-        OpenAiChatOptions options = OpenAiChatOptions.builder()
-                .responseFormat(ResponseFormat.builder().type(ResponseFormat.Type.JSON_OBJECT).build())
-                .build();
-        String response = chatClient
-                .prompt()
-                .system(systemPrompt)
-                // 输入用户消息
-                .user(prompt)
-                //设置响应格式为JSON_OBJECT
-                .options(options)
-                //响应的结果
-                // call代表非流式问答，返回的结果可以是ChatResponse，也可以是Entity（转成java类型），也可以是字符串直接提取回答结果。
-                .call()
-                // 获取回答内容
-                .content();
-        return Result.success(response);
+    public CompletableFuture<Result> chat(@RequestParam String prompt) {
+        log.info("接收到普通聊天请求: {}", prompt);
+        return chatService.chatAsync(prompt)
+                .thenApply(response -> {
+                    log.info("聊天异步处理完成");
+                    return Result.success(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("聊天异步处理失败", ex);
+                    return Result.error("聊天请求失败: " + ex.getMessage());
+                });
     }
     
-
-    @GetMapping(value = "/chatStream",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping("/postchat")
+    public CompletableFuture<Result> postchat(@RequestBody String prompt) {
+        log.info("接收到POST聊天请求");
+        return chatService.postChatAsync(prompt)
+                .thenApply(response -> {
+                    log.info("POST聊天异步处理完成");
+                    return Result.success(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("POST聊天异步处理失败", ex);
+                    return Result.error("聊天请求失败: " + ex.getMessage());
+                });
+    }
+    
+    @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@RequestParam String prompt) {
-        ChatClient chatClient = ChatClient.create(ChatModel);
-        return chatClient
-                .prompt()
-                .system("你是智能家居系统管家，若有指定格式则按格式回答")
-                // 输入单条提示词
-                .user(prompt)
-                // stream代表流式问答，返回的结果是ChatResponse
-                .stream()
-                .content();
+        log.info("接收到流式聊天请求: {}", prompt);
+        return chatService.streamChatAsync(prompt);
     }
-
-    @GetMapping(value = "/chatStream/history",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> chatStreamWithHistory(@RequestParam String prompt,@RequestParam String sessionID){
-        //设置聊天记录的最大长度为10，在内存中存储聊天记录，返回给大模型前将历史记录拼接到prompt中
-        var messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
-            .conversationId(sessionID)
-            .scheduler(Schedulers.boundedElastic()) // 添加调度器
-            .build();
-        return ChatClient.create(ChatModel)
-                .prompt()
-                .system("你是智能家居系统管家，用markdown格式返回")
-                .user(prompt)
-                .advisors(messageChatMemoryAdvisor)
-                .stream()
-                .content();
+    
+    @GetMapping(value = "/chatStream/history", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> chatStreamWithHistory(@RequestParam String prompt, @RequestParam String sessionID) {
+        log.info("接收到带历史记录的流式聊天请求: {}, 会话ID: {}", prompt, sessionID);
+        return chatService.streamChatWithHistoryAsync(prompt, sessionID);
     }
-
-    // @GetMapping("/ai/generate")
-    // public Map generate(@RequestParam String message) {
-    //     return Map.of("generation", this.ChatModel.call(message));
-    // }
- 
-    // @GetMapping("/ai/generateStream")
-    // public Flux<ChatResponse> generateStream(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-    //     Prompt prompt = new Prompt(new UserMessage(message));
-    //     return this.ChatModel.stream(prompt);
-    // }
-
-
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Result> handleException(Exception e) {
-        log.error("Unhandled exception", e);
-        Result errorResult = new Result(0, "Internal Server Error: " + e.getMessage(), null);
+        log.error("未捕获的异常", e);
+        Result errorResult = Result.error("Internal Server Error: " + e.getMessage());
         return ResponseEntity.status(500).body(errorResult);
     }
 }
