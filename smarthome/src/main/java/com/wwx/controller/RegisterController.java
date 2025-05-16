@@ -15,6 +15,15 @@ public class RegisterController {
     private UsersService usersService;
     @PostMapping("/register")
     public Result register(@RequestBody Users users) {//需要有username、password、name、entrydate四个参数JSON格式传入
+        try {
+            // 检查用户名是否已存在
+            Users existingUser = usersService.findByUsername(users.getUsername());
+            if (existingUser != null) {
+                return Result.error("用户名已存在");
+            }
+        } catch (Exception e) {
+            return Result.error("查询用户名失败");
+        }
         usersService.register(users);
         return Result.success("注册成功");
     }

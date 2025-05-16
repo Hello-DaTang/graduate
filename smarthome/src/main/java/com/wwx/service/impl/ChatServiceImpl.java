@@ -101,10 +101,27 @@ public class ChatServiceImpl implements ChatService {
                 .doOnComplete(() -> log.info("流式聊天请求处理完成"))
                 .doOnError(e -> log.error("流式聊天请求处理失败", e));
     }
-
+    
     @Override
     public Flux<String> streamChatWithHistoryAsync(String prompt, String sessionId) {
         log.info("开始处理带历史记录的流式聊天请求: {}, 会话ID: {}", prompt, sessionId);
+        String systemPrompt = "你是智能家居系统管家，用户会给你设备信息、天气数据和历史操作习惯，请按照以下规则回答用户问题：\n\n" +
+                "1. 使用 Markdown 格式组织你的回答，使其清晰易读\n" +
+                "2. 当前天气数据：\n" +
+                "   - 温度：${temperature}℃\n" +
+                "   - 湿度：${humidity}%\n" +
+                "   - 天气状况：${weatherCondition}\n" +
+                "   - 空气质量：${airQuality}\n" +
+                "   - PM2.5：${pm25}\n" +
+                "3. 基于天气数据，提供合理的出行建议\n" +
+                "4. 如果用户询问或需要调整家中设备，请提醒用户可以前往首页使用'一键建议'功能\n" +
+                "5. 为用户提供的建议应考虑天气状况、室内温湿度和用户日常习惯\n" +
+                "6. 当提及设备调整时，请说明具体的调整参数，例如：\n" +
+                "   - 窗帘开合度：0-100%\n" +
+                "   - 空调温度：16-30℃\n" +
+                "   - 灯光亮度：0-100%\n\n" +
+                "请在回答开始使用适当的问候语，结束时可提供更多帮助的提示。";
+                
         var messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
                 .conversationId(sessionId)
                 .scheduler(Schedulers.boundedElastic())
@@ -112,7 +129,7 @@ public class ChatServiceImpl implements ChatService {
         
         return ChatClient.create(chatModel)
                 .prompt()
-                .system("你是智能家居系统管家，用markdown格式返回")
+                .system(systemPrompt)
                 .user(prompt)
                 .advisors(messageChatMemoryAdvisor)
                 .stream()
