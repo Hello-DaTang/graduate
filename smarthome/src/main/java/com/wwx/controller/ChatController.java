@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wwx.pojo.ChatRequest;
 import com.wwx.pojo.Result;
 import com.wwx.service.ChatService;
 
@@ -52,17 +53,16 @@ public class ChatController {
                     return Result.error("聊天请求失败: " + ex.getMessage());
                 });
     }
-    
-    @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+      @GetMapping(value = "/chatStream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@RequestParam String prompt) {
         log.info("接收到流式聊天请求: {}", prompt);
         return chatService.streamChatAsync(prompt);
     }
     
-    @GetMapping(value = "/chatStream/history", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> chatStreamWithHistory(@RequestParam String prompt, @RequestParam String sessionID) {
-        log.info("接收到带历史记录的流式聊天请求: {}, 会话ID: {}", prompt, sessionID);
-        return chatService.streamChatWithHistoryAsync(prompt, sessionID);
+    @PostMapping(value = "/chatStream/history", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> chatStreamWithHistory(@RequestBody ChatRequest request) {
+        log.info("接收到带历史记录的流式聊天请求: {}, 会话ID: {}", request.getPrompt(), request.getSessionID());
+        return chatService.streamChatWithHistoryAsync(request.getPrompt(), request.getSessionID());
     }
     
     @ExceptionHandler(Exception.class)
