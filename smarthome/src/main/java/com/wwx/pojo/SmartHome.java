@@ -3,6 +3,7 @@ package com.wwx.pojo;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.wwx.utils.JsonMapDeserializer;
@@ -24,6 +25,7 @@ public class SmartHome {
     @JsonDeserialize(using = JsonMapDeserializer.class)
     private Map<String, Object> deviceData; // 设备状态数据（JSON 格式）
 
+    @JsonIgnore
     private String deviceDataJson; // 用于存储 JSON 字符串
 
     private LocalDateTime createTime; // 加入时间

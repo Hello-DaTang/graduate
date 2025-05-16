@@ -52,7 +52,7 @@ public class ChatServiceImpl implements ChatService {
     public CompletableFuture<String> postChatAsync(String prompt) {
         log.info("开始异步处理POST聊天请求");
         ChatClient chatClient = ChatClient.create(chatModel);
-        String systemPrompt = "你是一位智能家居专家AI，请根据用户的要求以及设备信息、天气数据和历史操作习惯，提供最合适的智能家居配置方案。\n" +
+        String systemPrompt = "你是一位智能家居专家AI，请根据用户的要求以及他提供的json格式设备信息、天气数据和历史操作习惯，提供最合适的智能家居配置方案。\n" +
                 "请分析设备数据、天气情况和用户操作习惯，提供具体的调整建议，以优化用户的智能家居体验。\n" +
                 "用户可以通过你的建议直接控制家中设备，因此你需要返回详细的设备控制参数。\n\n" +
                 "你的回复必须包含:\n" +
